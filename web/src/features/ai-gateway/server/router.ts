@@ -123,7 +123,10 @@ export const aiGatewayRouter = createTRPCRouter({
         config: await new GatewayConfigService(ctx.prisma).getConfig(
           input.orgId,
         ),
-        gatewayBaseUrl: getGatewayBaseUrl(getProductBaseUrl()),
+        gatewayBaseUrl: getGatewayBaseUrl(
+          getProductBaseUrl(),
+          env.LANGFUSE_AI_GATEWAY_PUBLIC_URL,
+        ),
       };
     }),
 

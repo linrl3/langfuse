@@ -254,6 +254,26 @@ describe("AI gateway control plane", () => {
     },
   );
 
+  it("returns the configured public gateway URL instead of the derived one", async () => {
+    const { caller, org } = await prepare();
+    const originalPublicUrl = env.LANGFUSE_AI_GATEWAY_PUBLIC_URL;
+    (
+      env as { LANGFUSE_AI_GATEWAY_PUBLIC_URL?: string }
+    ).LANGFUSE_AI_GATEWAY_PUBLIC_URL = "https://ai.example.com/gateway/";
+
+    try {
+      await expect(
+        caller.aiGateway.getConfig({ orgId: org.id }),
+      ).resolves.toMatchObject({
+        gatewayBaseUrl: "https://ai.example.com/gateway",
+      });
+    } finally {
+      (
+        env as { LANGFUSE_AI_GATEWAY_PUBLIC_URL?: string }
+      ).LANGFUSE_AI_GATEWAY_PUBLIC_URL = originalPublicUrl;
+    }
+  });
+
   it("applies the environment-specific organization allowlist", async () => {
     const { caller, org } = await prepare();
     env.LANGFUSE_AI_GATEWAY_ORGANIZATION_ID_ALLOWLIST.splice(

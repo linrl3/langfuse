@@ -371,6 +371,20 @@ export const env = createEnv({
     // Enables the gateway for every organization, e.g. on self-hosted
     // deployments. When false, LANGFUSE_AI_GATEWAY_ORGANIZATION_ID_ALLOWLIST applies.
     LANGFUSE_AI_GATEWAY_ENABLED: z.enum(["true", "false"]).default("false"),
+    // Public gateway URL shown to users. Unset derives it from NEXTAUTH_URL.
+    LANGFUSE_AI_GATEWAY_PUBLIC_URL: z
+      .url({ protocol: /^https?$/ })
+      .refine(
+        (value) => {
+          const url = new URL(value);
+          return !url.username && !url.password && !/[?#]/.test(value);
+        },
+        {
+          message:
+            "LANGFUSE_AI_GATEWAY_PUBLIC_URL must be an http(s) URL without credentials, query or fragment",
+        },
+      )
+      .optional(),
     LANGFUSE_AI_GATEWAY_ORGANIZATION_ID_ALLOWLIST: z
       .string()
       .optional()
@@ -1154,6 +1168,7 @@ export const env = createEnv({
     LANGFUSE_AI_GATEWAY_SERVICE_KEY_PREVIOUS:
       process.env.LANGFUSE_AI_GATEWAY_SERVICE_KEY_PREVIOUS,
     LANGFUSE_AI_GATEWAY_ENABLED: process.env.LANGFUSE_AI_GATEWAY_ENABLED,
+    LANGFUSE_AI_GATEWAY_PUBLIC_URL: process.env.LANGFUSE_AI_GATEWAY_PUBLIC_URL,
     LANGFUSE_AI_GATEWAY_ORGANIZATION_ID_ALLOWLIST:
       process.env.LANGFUSE_AI_GATEWAY_ORGANIZATION_ID_ALLOWLIST,
     LANGFUSE_AI_GATEWAY_JWT_KEY_ID: process.env.LANGFUSE_AI_GATEWAY_JWT_KEY_ID,

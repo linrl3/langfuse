@@ -32,6 +32,24 @@ describe("getGatewayBaseUrl", () => {
     );
   });
 
+  it.each([
+    ["https://ai.example.com", "https://ai.example.com"],
+    ["https://ai.example.com/", "https://ai.example.com"],
+    [
+      "https://langfuse.example.com/gateway//",
+      "https://langfuse.example.com/gateway",
+    ],
+    ["http://gateway.internal:8080/", "http://gateway.internal:8080"],
+  ])("returns the configured public URL %s as %s", (publicUrl, expected) => {
+    for (const productUrl of [
+      "https://cloud.langfuse.com/",
+      "https://staging.langfuse.com/",
+      "http://localhost:3000/",
+    ]) {
+      expect(getGatewayBaseUrl(new URL(productUrl), publicUrl)).toBe(expected);
+    }
+  });
+
   it("points localhost at the local gateway port", () => {
     expect(getGatewayBaseUrl(new URL("http://localhost:3000/"))).toBe(
       "http://localhost:8080/v1",
